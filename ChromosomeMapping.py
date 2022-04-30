@@ -5,7 +5,6 @@ gene mapping with index:
     0. Layer size
     1. activation function
     2. max iterations
-    3. solver function
 """
 
 import random

@@ -4,6 +4,7 @@ import Model as m
 from ChromosomeMapping import get_gene_mapping, mutation
 import math
 from Export import Export   
+from operator import itemgetter
 
 data = m.DataSource()
 neural_network_list = {}
@@ -20,7 +21,6 @@ initial_population = [
                         [7, 2, 2],
                         [5, 4, 1]
                     ]
-
 
 def generate_neural_newtwork(chromosome):
     nn_name = uuid.uuid4()
@@ -40,45 +40,56 @@ def generate_neural_newtwork(chromosome):
     return nn_name
 
 def selectBest(candidates, count):
+    if len(candidates)<count:
+        return candidates
+    else:
+        sorted_candidates = sorted(candidates,key=itemgetter(4))
+        return sorted_candidates[0:count]
+    
     # random candicate selection
-    rand_index = random.randint(0, len(candidates)-1)
-    max = fitness_score(candidates[rand_index])
-    selected = []
-    selected.append(candidates[rand_index])
+    # rand_index = random.randint(0, len(candidates)-1)
+    # max = fitness_score(candidates[rand_index])
+    # selected = []
+    # selected.append(candidates[rand_index])
 
     # selecting best
-    for i, candidate in enumerate(candidates):
-        if len(selected) < count and i != rand_index:
-            score = fitness_score(candidate)
-            if score > max:
-                max = score
-                selected.append(candidate)
+    # for i, candidate in enumerate(candidates):
+    #     if len(selected) < count and i != rand_index:
+    #         score = fitness_score(candidate)
+    #         if score > max:
+    #             max = score
+    #             selected.append(candidate)
 
-    if len(selected) < count:
-        new_rand = random.randint(0, len(candidates)-1)
-        while new_rand == rand_index:
-            new_rand = random.randint(0, len(candidates)-1)
+    # if len(selected) < count:
+    #     new_rand = random.randint(0, len(candidates)-1)
+    #     while new_rand == rand_index:
+    #         new_rand = random.randint(0, len(candidates)-1)
 
-        selected.append(candidates[new_rand])
+    #     selected.append(candidates[new_rand])
 
-    return selected
+    # return selected
 
 def cross_over(parent_1, parent_2):
     
-    crossover_point = math.floor(len(parent_1)/2)
+    p1,p2=parent_1[0:3],parent_2[0:3]
     
-    child1 = parent_1[:crossover_point]
-    child1.extend(parent_2[crossover_point:])
+    crossover_point = math.floor(len(p1)/2)
+    
+    child1 = p1[:crossover_point]
+    child1.extend(p2[crossover_point:])
 
-    child2 = parent_2[:crossover_point]
-    child2.extend(parent_1[crossover_point:])
+    child2 = p2[:crossover_point]
+    child2.extend(p1[crossover_point:])
 
     return child1, child2
 
 def fitness_score(chromosome):
-    nn = neural_network_list[chromosome[3]]
-    X,y = data.get_test_data()
-    return nn.evaluate_model(X,y)
+    if len(chromosome)<5:
+        nn = neural_network_list[chromosome[3]]
+        X,y = data.get_test_data()
+        return nn.evaluate_model(X,y)
+    else:
+        return chromosome[4]
 
 def getMaxScore(generation,candidates):
     max = 0
@@ -106,7 +117,9 @@ def evolution():
     population = initial_population
     for i in range(len(population)):
         nn_name = generate_neural_newtwork(population[i])
-        population[i].append(nn_name)
+        population[i].append(nn_name)   # 3rd index hold NN name
+        # print(len(population[i]))
+        population[i].append(fitness_score(population[i])) # 4th index holds fitness score
 
     # initial variables
     n_gen = 1
@@ -142,6 +155,7 @@ def evolution():
             mutated_chromosome = mutation(new_children[i])
             nn_name = generate_neural_newtwork(mutated_chromosome)
             mutated_chromosome.append(nn_name)
+            mutated_chromosome.append(fitness_score(mutated_chromosome))
             
             mutated_children.append(mutated_chromosome)
 
