@@ -11,6 +11,13 @@ import random
 
 # Constants for gene mapping with model properties
 layer_size_search_space = [
+    [10],
+    [10,20,10],
+    [20,25,30],
+    [50],
+    [50,100],
+    [100],
+    [15,30,45],
     [32],
     [32, 64, 32],
     [32, 64, 128, 64, 32],
@@ -25,7 +32,7 @@ layer_size_flip_probability = 0.5
 activation_function_search_space = ['relu', 'tanh', 'logistic']
 activation_function_flip_probability = 0.5
 
-max_iterations_search_space = [100, 150, 200, 250, 300, 350]
+max_iterations_search_space = [100, 110, 115, 120, 125, 150, 200, 250, 300, 350]
 max_iterations_flip_probability = 0.1
 
 
