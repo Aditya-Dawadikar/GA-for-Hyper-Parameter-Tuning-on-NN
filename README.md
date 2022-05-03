@@ -7,7 +7,7 @@ How to run?
 Go to your root folder (same as Main.py)
 
 ```bash
-  python Main.py
+  streanlit main.py
 ```
 
 ## Dataset
